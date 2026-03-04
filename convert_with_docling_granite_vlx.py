@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import logging
 import os
+import re
 import sys
 from pathlib import Path
 
@@ -81,6 +83,67 @@ def build_converter(
     return DocumentConverter(format_options=format_options)
 
 
+def extract_and_save_images(document_dict: dict, output_dir: Path) -> dict[str, str]:
+    """Extract images from Docling document JSON and save them to disk.
+    
+    Returns a mapping of old image URI to new local paths.
+    """
+    images_dir = output_dir / "images"
+    image_mapping = {}
+    
+    # Extract images from the document dict structure
+    if "pictures" not in document_dict:
+        return image_mapping
+    
+    image_count = 0
+    
+    for picture in document_dict["pictures"]:
+        try:
+            if "image" not in picture or "uri" not in picture["image"]:
+                continue
+            
+            uri = picture["image"]["uri"]
+            mime_type = picture["image"].get("mimetype", "image/png")
+            
+            # Determine file extension from mime type
+            ext_map = {
+                "image/png": "png",
+                "image/jpeg": "jpg",
+                "image/jpg": "jpg",
+                "image/webp": "webp",
+            }
+            extension = ext_map.get(mime_type, "png")
+            
+            # Check if it's a base64 data URI
+            if uri.startswith("data:"):
+                # Extract base64 data
+                try:
+                    # Format: data:image/png;base64,<base64_string>
+                    base64_data = uri.split(",", 1)[1]
+                    image_data = base64.b64decode(base64_data)
+                except Exception as e:
+                    print(f"[warning] Failed to decode base64 image: {e}")
+                    continue
+                
+                image_count += 1
+                images_dir.mkdir(parents=True, exist_ok=True)
+                
+                # Save image
+                image_filename = f"image_{image_count:03d}.{extension}"
+                image_path = images_dir / image_filename
+                image_path.write_bytes(image_data)
+                
+                # Track the image for reference updates
+                local_path = f"images/{image_filename}"
+                image_mapping[uri] = local_path
+                print(f"[info] Extracted image: {image_path}")
+        except Exception as e:
+            print(f"[warning] Failed to extract image: {e}")
+            continue
+    
+    return image_mapping
+
+
 def convert_pdf(
     input_pdf: Path,
     output_dir: Path,
@@ -129,8 +192,24 @@ def convert_pdf(
 
     json_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
 
+    # Extract and save images
+    print("[info] Extracting images...")
+    image_mapping = extract_and_save_images(payload, output_dir)
+    
+    # Update markdown with local image references
+    if image_mapping:
+        for old_uri, new_path in image_mapping.items():
+            # Replace any reference to the data URI with local path
+            md_text = md_text.replace(f"(data:", f"({new_path}")
+            # More lenient replacement in case URI appears differently
+            md_text = re.sub(r"\!\[.*?\]\s*\(\s*data:[^)]*\)", f"![Image]({new_path})", md_text)
+        
+        md_path.write_text(md_text, encoding="utf-8")
+
     print(f"Done. Markdown: {md_path}")
     print(f"Done. JSON:     {json_path}")
+    if image_mapping:
+        print(f"Done. Images:   {output_dir / 'images'} ({len(image_mapping)} image(s))")
 
 
 def parse_args() -> argparse.Namespace:
