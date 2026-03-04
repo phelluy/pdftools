@@ -1,174 +1,174 @@
 # PDF to Markdown Converters
 
-Ce projet propose deux outils pour convertir des fichiers PDF en Markdown avec extraction d'images.
+Two tools to convert PDF files to Markdown with image extraction. An online tool using the Mistral OCR API, and a local tool using IBM's Granite VLM model via Docling.
 
 ## Installation
 
-### 1. Créer un environnement virtuel avec uv
+### 1. Create a virtual environment with uv
 
 ```bash
 uv venv
 source .venv/bin/activate
 ```
 
-Ou directement sans activer :
+Or directly without activating:
 ```bash
 uv venv && source .venv/bin/activate
 ```
 
-### 2. Installer les dépendances
+### 2. Install dependencies
 
 ```bash
 uv pip install -r requirements.txt
 ```
 
-**Dépendances :**
-- `requests` - Pour les appels API
-- `docling` - Convertisseur PDF avec VLM (Granite)
-- `pillow` - Traitement d'images
-- `huggingface-hub` - Pour télécharger les modèles
-- `mlx` - Inférence sur Apple Silicon (recommandé pour Mac)
-- `mlx-vlm` - Modèles VLM pour MLX
+**Dependencies:**
+- `requests` - For API calls
+- `docling` - PDF converter with VLM (Granite)
+- `pillow` - Image processing
+- `huggingface-hub` - Download models
+- `mlx` - Inference on Apple Silicon (recommended for Mac)
+- `mlx-vlm` - VLM models for MLX
 
-## Outils disponibles
+## Available Tools
 
 ### 1. Docling PDF to Markdown (`docling-pdf2md.py`)
 
-Convertit un PDF en Markdown en utilisant le modèle Granite VLX de IBM via Docling. **Recommandé pour les visualisations complexes et les images.**
+Converts a PDF to Markdown using IBM's Granite VLX model via Docling. **Recommended for complex visualizations and images.**
 
-#### Utilisation
+#### Usage
 
 ```bash
-python docling-pdf2md.py <chemin_pdf> -o <dossier_sortie>
+python docling-pdf2md.py <pdf_path> -o <output_dir>
 ```
 
-#### Exemples
+#### Examples
 
 ```bash
-# Utilisation basique
+# Basic usage
 python docling-pdf2md.py document.pdf -o output
 
-# Avec timeout personnalisé (en secondes)
+# With custom timeout (in seconds)
 python docling-pdf2md.py document.pdf -o output --timeout-seconds 300
 
-# Forcer l'utilisation de Transformers au lieu de MLX
+# Force Transformers engine instead of MLX
 python docling-pdf2md.py document.pdf -o output --force-transformers
 
-# Logs verbeux pour le téléchargement des modèles
+# Verbose logs for model download
 python docling-pdf2md.py document.pdf -o output --verbose-download
 ```
 
-#### Résultat
+#### Output
 
-Le dossier de sortie contient :
-- `<nom>.md` - Markdown converti avec images locales
-- `<nom>.json` - Structure Docling complète en JSON
-- `images/` - Images extraites du PDF
+The output directory contains:
+- `<name>.md` - Converted Markdown with local image references
+- `<name>.json` - Complete Docling structure in JSON
+- `images/` - Images extracted from the PDF
 
-#### Exemple : `test/docling_output/`
+#### Example: `test/docling_output/`
 
 ```
 docling_output/
-├── sample.md          # Markdown avec références d'images
-├── sample.json        # Données structurées
+├── sample.md          # Markdown with image references
+├── sample.json        # Structured data
 └── images/
-    └── image_001.png  # Image extraite
+    └── image_001.png  # Extracted image
 ```
 
 ---
 
 ### 2. Mistral OCR to Markdown (`mistral-pdf2md.py`)
 
-Convertit un PDF en Markdown en utilisant l'API Mistral OCR. **Robuste pour les PDFs scannés et les contenus OCR.**
+Converts a PDF to Markdown using the Mistral OCR API. **Robust for scanned PDFs and OCR content.**
 
 #### Configuration
 
-Avant de lancer le script, définir la clé API Mistral :
+Before running the script, set the Mistral API key:
 
 ```bash
-export MISTRAL_API_KEY="votre-clé-api"
+export MISTRAL_API_KEY="your-api-key"
 ```
 
-#### Utilisation
+#### Usage
 
 ```bash
-python mistral-pdf2md.py <dossier>
+python mistral-pdf2md.py <directory>
 ```
 
-Parcourt récursivement le dossier en cherchant tous les fichiers `.pdf` et crée un `.md` correspondant.
+Recursively scans the directory for all `.pdf` files and creates a corresponding `.md` file.
 
-#### Exemple
+#### Example
 
 ```bash
-# Convertir tous les PDFs du dossier 'documents'
+# Convert all PDFs in the 'documents' folder
 python mistral-pdf2md.py documents
 
-# Convertir les PDFs du dossier courant
+# Convert PDFs in the current directory
 python mistral-pdf2md.py .
 ```
 
-#### Résultat
+#### Output
 
-Pour chaque PDF, génère :
-- `<nom>.md` - Markdown extrait
-- `sample_images/` - Images extraites (si présentes)
+For each PDF, generates:
+- `<name>.md` - Extracted Markdown
+- `sample_images/` - Extracted images (if present)
 
 ---
 
-## Test rapide
+## Quick Test
 
-Une demo est disponible dans le dossier `test/` :
+A demo is available in the `test/` folder:
 
 ```bash
-# Le PDF de test est déjà généré
+# Test PDF is already generated
 ls test/sample.pdf
 
-# Teste Docling
+# Test Docling
 python docling-pdf2md.py test/sample.pdf -o test/docling_output
 
-# Teste Mistral (nécessite MISTRAL_API_KEY)
+# Test Mistral (requires MISTRAL_API_KEY)
 python mistral-pdf2md.py test
 ```
 
 ---
 
-## Dépannage
+## Troubleshooting
 
-### ⚠️ Warning : `mx.metal.device_info is deprecated`
+### ⚠️ Warning: `mx.metal.device_info is deprecated`
 
-C'est un avertissement interne de MLX, pas d'erreur. Le script fonctionne correctement.
+This is an internal MLX warning, not an error. The script works correctly.
 
-### ⚠️ Erreur : `Could not import Docling classes`
+### ⚠️ Error: `Could not import Docling classes`
 
-Docling n'est pas installé. Réinstaller :
+Docling is not installed. Reinstall it:
 ```bash
 uv pip install docling --force-reinstall
 ```
 
-### ⚠️ Erreur : `No API key found for Mistral`
+### ⚠️ Error: `No API key found for Mistral`
 
-Configurer la clé API avant de lancer :
+Set the API key before running:
 ```bash
-export MISTRAL_API_KEY="la-clé"
+export MISTRAL_API_KEY="your-key"
 ```
 
 ---
 
-## Comparaison des deux outils
+## Tools Comparison
 
 | Feature | Docling | Mistral |
 |---------|---------|---------|
-| Extraction images | ✅ Oui | ✅ Oui |
-| OCR | ✅ Oui (VLM) | ✅ Oui |
-| PDFs scannés | ✅ Bien | ✅ Excellent |
-| Coût | ✅ Gratuit | ⚠️ API payante |
-| Installation | ⚠️ Lourde | ✅ Légère |
-| Vitesse | ✅ Rapide | ⚠️ Nécessite appels réseau |
-| Apple Silicon | ✅ MLX natif | ℹ️ Réseau |
+| Image extraction | ✅ Yes | ✅ Yes |
+| OCR | ✅ Yes (VLM) | ✅ Yes |
+| Scanned PDFs | ✅ Good | ✅ Excellent |
+| Cost | ✅ Free | ⚠️ API paid |
+| Installation | ⚠️ Heavy | ✅ Light |
+| Speed | ✅ Fast | ⚠️ Network calls |
+| Apple Silicon | ✅ MLX native | ℹ️ Network |
 
 ---
 
-## Docs
+## Documentation
 
 - [Docling Documentation](https://github.com/DS4SD/docling)
 - [Mistral API Documentation](https://docs.mistral.ai/)
