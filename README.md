@@ -2,7 +2,7 @@
 
 Boîte à outils pour expérimentations LLM, organisée en deux volets :
 
-- `mcptools` : serveurs MCP locaux (Wikipedia, StackOverflow, recherche/SearXNG) exposés via `mcp-proxy`.
+- `mcptools` : serveurs MCP locaux (Python, Wikipedia, StackOverflow, recherche/SearXNG) exposés via `mcp-proxy`.
 - `pdftools` : conversion de PDF vers Markdown avec extraction d'images (en local avec Docling/Granite ou via l'API Mistral).
 
 ## Structure
