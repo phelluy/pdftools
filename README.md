@@ -23,11 +23,14 @@ llmtools/
 
 ## 1) Outils MCP (`mcptools`)
 
-Configuration locale de 3 serveurs MCP, tous encapsulés par `mcp-trunc-proxy` pour limiter la taille des réponses :
+Configuration locale de 4 serveurs MCP :
 
 - `wikipedia` (langue `fr`)
 - `stackoverflow`
 - `search` (via SearXNG local)
+- `python` (interpréteur Python MCP, avec bibliothèques scientifiques)
+
+Les serveurs `wikipedia`, `stackoverflow` et `search` sont encapsulés par `mcp-trunc-proxy` pour limiter la taille des réponses.
 
 ### Prérequis
 
@@ -53,8 +56,11 @@ Le script :
 - `http://127.0.0.1:8001/servers/wikipedia/mcp`
 - `http://127.0.0.1:8001/servers/stackoverflow/mcp`
 - `http://127.0.0.1:8001/servers/search/mcp`
+- `http://127.0.0.1:8001/servers/python/mcp`
 
 Test direct de SearXNG : `http://127.0.0.1:8888`
+
+Note : le serveur `python` utilise `mcp-python-interpreter` avec un environnement virtuel pointant vers un chemin local externe au dépôt (défini dans `mcptools/config-mcp.json`).
 
 Voir aussi : `mcptools/README.md`
 

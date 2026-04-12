@@ -2,7 +2,7 @@
 
 ## Comment ça marche avec mcp-trunc-proxy
 
-Chaque serveur MCP (Wikipedia, StackOverflow, Search) est lancé derrière `mcp-trunc-proxy`.
+Les serveurs MCP `wikipedia`, `stackoverflow` et `search` sont lancés derrière `mcp-trunc-proxy`.
 
 Le principe est le suivant :
 
@@ -13,7 +13,7 @@ Le principe est le suivant :
 
 Ce montage évite les réponses trop longues, réduit le bruit dans les sorties et garde des résultats plus stables côté client.
 
-Configuration locale de serveurs MCP (Wikipedia, StackOverflow, Search via SearXNG) exposés par `mcp-proxy` sur le port `8001`.
+Configuration locale de serveurs MCP (Wikipedia, StackOverflow, Search via SearXNG, et Python) exposés par `mcp-proxy` sur le port `8001`.
 
 ## Fichiers du dépôt
 
@@ -22,7 +22,7 @@ Configuration locale de serveurs MCP (Wikipedia, StackOverflow, Search via SearX
 
 ## Prérequis
 
-- `uvx` installé (pour lancer `simplexng`, `mcp-proxy`, `stackoverflow-mcp`)
+- `uvx` installé (pour lancer `simplexng`, `mcp-proxy`, `stackoverflow-mcp`, `mcp-python-interpreter`)
 - `npx` installé (Node.js) pour lancer `mcp-trunc-proxy`, `wikipedia-mcp`, `mcp-searxng`
 
 ## Démarrage
@@ -45,7 +45,7 @@ Le script fait, dans cet ordre :
 
 ## Serveurs exposés
 
-Le fichier `config-mcp.json` expose 3 serveurs dans `mcpServers` :
+Le fichier `config-mcp.json` expose 4 serveurs dans `mcpServers` :
 
 - `wikipedia`
   - via `wikipedia-mcp`
@@ -58,6 +58,10 @@ Le fichier `config-mcp.json` expose 3 serveurs dans `mcpServers` :
   - via `mcp-searxng`
   - variable d'environnement `SEARXNG_URL=http://localhost:8888`
   - encapsulé avec `mcp-trunc-proxy`
+- `python`
+  - via `mcp-python-interpreter`
+  - bibliothèques préchargées : `sympy`, `numpy`, `scipy`, `matplotlib`, `pandas`
+  - accès système activé via `MCP_ALLOW_SYSTEM_ACCESS=1`
 
 ## URLs à utiliser côté client MCP
 
@@ -66,6 +70,7 @@ Une fois lancé, les points d'accès utiles sont :
 - http://127.0.0.1:8001/servers/wikipedia/mcp
 - http://127.0.0.1:8001/servers/stackoverflow/mcp
 - http://127.0.0.1:8001/servers/search/mcp
+- http://127.0.0.1:8001/servers/python/mcp
 
 Important : utiliser les points d'accès en `/mcp` côté client (dans l'interface web de llama-server, rubrique MCP), même si certains logs de `mcp-proxy` affichent aussi des URLs en `/sse`.
 
