@@ -25,6 +25,40 @@ Configuration locale de serveurs MCP (Wikipedia, StackOverflow, Search via SearX
 - `uvx` installé (pour lancer `simplexng`, `mcp-proxy`, `stackoverflow-mcp`, `mcp-python-interpreter`)
 - `npx` installé (Node.js) pour lancer `mcp-trunc-proxy`, `wikipedia-mcp`, `mcp-searxng`
 
+## Depannage SearXNG (403)
+
+### 1. Le limiter SearXNG bloque les requetes non-navigateur
+
+Le log peut afficher explicitement : `WARNING  missing config file: limiter.toml`.
+
+Sans ce fichier, SearXNG active une protection anti-bot par defaut qui rejette les requetes HTTP sans User-Agent navigateur (comme celles de `mcp-searxng`).
+
+Creer le fichier `~/.config/simplexng/limiter.toml` pour desactiver ce filtre localement :
+
+```bash
+cat > ~/.config/simplexng/limiter.toml << 'EOF'
+[botdetection.ip_limit]
+link_token = false
+
+[botdetection.ip_lists]
+block_ip = []
+pass_ip = ["127.0.0.1", "::1"]
+EOF
+```
+
+### 2. Le format JSON doit etre active dans les settings
+
+Dans `~/.config/simplexng/simplexng_settings.yml`, verifier/ajouter :
+
+```yaml
+search:
+  formats:
+    - html
+    - json
+```
+
+Sans cela, les appels API JSON (comme ceux de `mcp-searxng`) peuvent recevoir un `403`.
+
 ## Démarrage
 
 ```bash

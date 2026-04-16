@@ -68,9 +68,9 @@
         "pandas",
         "mcp-python-interpreter",
         "--dir",
-        "/Users/helluy/gitlab/mcp-configs",
+        "$HOME/gitlab/mcp-configs",
         "--python-path",
-        "/Users/helluy/gitlab/mcp-configs/.venv/bin/python"
+        "$HOME/gitlab/mcp-configs/.venv/bin/python"
       ],
       "env": {
         "MCP_ALLOW_SYSTEM_ACCESS": "1"
