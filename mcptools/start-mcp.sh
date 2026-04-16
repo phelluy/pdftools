@@ -19,7 +19,7 @@ uvx mcp-proxy \
   --named-server-config config-mcp.json \
   --allow-origin "*" \
   --port 8001 \
-  --stateless
+  --stateless 
 
 # 3. Arrêter SearXNG proprement quand mcp-proxy s'arrête (Ctrl+C)
 echo "Arrêt de SearXNG..."
